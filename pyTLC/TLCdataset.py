@@ -87,6 +87,11 @@ class Xic():
 
 class TLCdataset():
     def __init__(self, filename, xpos=[], x_dim=0):
+        """
+        :param filename: source of imzml data
+        :param xpos: coordinates of x-axis
+        :param x_dim: axis in data that corresponds to the tlc lane
+        """
         self.ims_dataset = inMemoryIMS.inMemoryIMS(filename)
         self.set_dim(x_dim)
         tic_im = self.ims_dataset.get_summary_image().xic_to_image(0)

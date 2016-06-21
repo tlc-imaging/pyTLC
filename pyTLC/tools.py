@@ -1,4 +1,5 @@
-def run_database_search(tlc_dataset):
+import pandas as pd
+def run_database_search(tlc_dataset, lipid_database):
     ppm = 15.
     max_peaks = 3
     adducts = ["+H", "+Na", "+K"]

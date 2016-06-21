@@ -42,7 +42,7 @@ def search_headgroup_loss(filename, x_dim):
 def search_headgroup_loss_database(filename, x_dim):
     from pyTLC.tools import run_database_search
     tlc_dataset = TLCdataset(filename, x_dim=x_dim)
-    run_database_search(tlc_dataset)
+    run_database_search(tlc_dataset, lipid_database)
 
 
 if __name__ == "__main__":

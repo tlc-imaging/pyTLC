@@ -95,9 +95,9 @@ class TLCdataset():
         self.ims_dataset = inMemoryIMS.inMemoryIMS(filename)
         self.set_dim(x_dim)
         tic_im = self.ims_dataset.get_summary_image().xic_to_image(0)
-        self.tic = np.sum(tic_im, axis=self.y_dim)
+        self.tic = np.sum(tic_im, axis=self.x_dim)
         if xpos == []:
-            self.x_pos = range(np.shape(tic_im)[x_dim])
+            self.x_pos = range(len(self.tic))
 
     def set_dim(self,x_dim):
         if x_dim == 0:
@@ -107,13 +107,14 @@ class TLCdataset():
             self.x_dim = 1
             self.y_dim = 0
 
-    def get_xic(self, mz, tol):
+    def get_xic(self, mz, tol, w=5, min_int=1):
         mz = np.asarray(mz)
         tol = np.asarray(tol)
         im = self.ims_dataset.get_ion_image(mz, tol).xic_to_image(0)
         im = im_smoothing.median(im, size=3)
-        xic = tlc_smoothing.sqrt_apodization(im)
-        xic = Xic(xic=[self.x_pos, xic])
+        xic = tlc_smoothing.sqrt_apodization(im, w=w)
+        xic = Xic(xic=[self.x_pos, xic], xic_features=centroid_detection.gradient(np.asarray(range(len(xic))), np.asarray(xic),
+                                                    min_intensity=min_int))
         return xic
 
 
@@ -125,6 +126,8 @@ class TLCdataset():
         self.feature_list=[]
         for ii, m in enumerate(mean_spec_c[0]):
             im = ion_datacube.xic_to_image(ii)
+            if self.x_dim==1:
+                im=im.T
             im = im_smoothing.median(im, size=3)
             m_s_f_s = tlc_smoothing.sqrt_apodization(im, w=w)
             m_s_f_s_c = centroid_detection.gradient(np.asarray(range(len(m_s_f_s))), np.asarray(m_s_f_s),

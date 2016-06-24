@@ -1,21 +1,22 @@
-from pyTLC.TLCdataset import  TLCdataset
-from pyTLC.tools import run_database_search 
+import argparse
 import matplotlib.pyplot as plt
 import numpy as np
+from pyTLC.TLCdataset import  TLCdataset
+from pyTLC.tools import run_database_search 
 
-def get_library_matches(filename, x_dim):
+def get_library_matches(filename, libfile, x_dim):
     tlc_dataset = TLCdataset(filename, x_dim=x_dim)
-    feature_list = run_database_search(tlc_dataset, "../data/swiss_lipids_quick_Species.csv")
+    feature_list = run_database_search(tlc_dataset, libfile)
     print feature_list
     return feature_list
 
-def compare_tlc_datasets(tlc_dataset_files, x_dim):
+def compare_tlc_datasets(tlc_dataset_files, libfile, x_dim):
     """
     
     """
     feature_lists = []
     for tlc_dataset_file in tlc_dataset_files:
-        feature_list = get_library_matches(tlc_dataset_file, x_dim)
+        feature_list = get_library_matches(tlc_dataset_file, libfile, x_dim)
         print feature_list
         feature_lists.append(feature_list)
 
@@ -63,21 +64,14 @@ def compare_tlc_datasets(tlc_dataset_files, x_dim):
     ax.set_yticklabels(row_labels, minor=False)
     plt.show()
         
-    
-    
-            
-    
-
-    
-
-
-
-
 if __name__ == "__main__":
     # do argparsing etc
+    help_msg = ('show features for a dataset')
+    parser = argparse.ArgumentParser(description=help_msg)
+    parser.add_argument('--filenames', help='data filepaths (imzml)', nargs='+')
+    parser.add_argument('--libfile', help='library file (.csv)')
+    parser.add_argument('--x_dim', help='chomatographic dimension (0=columns, 1=rows)')
+    parser.set_defaults(filename='', libfile="../data/swiss_lipids_quick_Species.csv", x_dim=0)
+    args = parser.parse_args()
     # files:
-    file1 = "/home/socall/Downloads/140802_TLC_mosquito-DHB_01.imzML"
-    file2 = "/home/socall/Downloads/140802_TLC_mosquito-DHB_02.imzML"
-    filelist = [file1, file2]
-
-    compare_tlc_datasets(filelist, 0)
+    compare_tlc_datasets(args.filenames, args.libfile, args.x_dim)

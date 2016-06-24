@@ -17,10 +17,11 @@ class Xic():
         self._c_x = []
         self._c_i = []
         self._processing = []
+        self._indices = []
         if xic != []:
             self._x, self._i = xic
         if xic_features != []:
-            self._c_x, self._c_i= xic_features
+            self._c_x, self._c_i, self._indices= xic_features
 
     # Private basic spectrum I/O
     def __add_xic_x(self, mzs):
@@ -96,6 +97,7 @@ class TLCdataset():
         self.set_dim(x_dim)
         tic_im = self.ims_dataset.get_summary_image().xic_to_image(0)
         self.tic = np.sum(tic_im, axis=self.x_dim)
+        
         if xpos == []:
             self.x_pos = range(len(self.tic))
 
@@ -108,13 +110,14 @@ class TLCdataset():
             self.y_dim = 0
 
     def get_xic(self, mz, tol, w=5, min_int=1):
-        mz = np.asarray(mz)
+        mz = np.asarray([mz,])
         tol = np.asarray(tol)
         im = self.ims_dataset.get_ion_image(mz, tol).xic_to_image(0)
+        #if np.max(im)>0.0:
+        print "Max IM:",np.max(im)
         im = im_smoothing.median(im, size=3)
         xic = tlc_smoothing.sqrt_apodization(im, w=w)
-        xic = Xic(xic=[self.x_pos, xic], xic_features=centroid_detection.gradient(np.asarray(range(len(xic))), np.asarray(xic),
-                                                    min_intensity=min_int))
+        xic = Xic(xic=[self.x_pos, xic], xic_features=centroid_detection.gradient(np.asarray(range(len(xic))), np.asarray(xic),                                     min_intensity=min_int))
         return xic
 
 
